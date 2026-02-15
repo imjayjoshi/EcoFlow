@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useState, useCallback } from "react";
 
 export type UserRole = "engineering" | "approver" | "operations" | "admin";
@@ -11,6 +13,7 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -27,10 +30,21 @@ const MOCK_USERS: Record<string, User> = {
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
     const stored = localStorage.getItem("ecoflow_user");
-    return stored ? JSON.parse(stored) : null;
-  });
+    if (stored) {
+      try {
+        setUser(JSON.parse(stored));
+      } catch (e) {
+        console.error("Failed to parse stored user", e);
+        localStorage.removeItem("ecoflow_user");
+      }
+    }
+    setIsLoading(false);
+  }, []);
 
   const login = useCallback(async (email: string, _password: string) => {
     await new Promise((r) => setTimeout(r, 600));
@@ -46,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

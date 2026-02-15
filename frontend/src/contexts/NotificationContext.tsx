@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { notifications as initialNotifications, type Notification } from "@/data/notificationsData";
 
@@ -51,7 +53,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
           priority: "low",
         },
       ];
-      
+
       // Add a demo notification after 30 seconds
       const randomNotif = demoNotifications[Math.floor(Math.random() * demoNotifications.length)];
       addNotification(randomNotif);

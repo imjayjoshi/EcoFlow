@@ -1,5 +1,8 @@
+"use client";
+
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth, type UserRole } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Package, Layers, FileText, CheckSquare,
@@ -30,8 +33,8 @@ const navItems: NavItem[] = [
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
 
   const visibleItems = navItems.filter(
@@ -47,7 +50,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    router.push("/login");
   };
 
   return (
@@ -72,11 +75,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
           {visibleItems.map((item) => {
-            const active = location.pathname.startsWith(item.path);
+            const active = pathname.startsWith(item.path);
             return (
               <Link
                 key={item.path}
-                to={item.path}
+                href={item.path}
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   active
@@ -124,7 +127,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
           <div className="flex items-center gap-4">
             <h1 className="text-sm font-semibold text-foreground">
-              {visibleItems.find((i) => location.pathname.startsWith(i.path))?.label ?? "ECOFlow"}
+              {visibleItems.find((i) => pathname.startsWith(i.path))?.label ?? "ECOFlow"}
             </h1>
             {/* Search */}
             <div className="relative hidden md:flex">
@@ -139,7 +142,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             {/* Notifications */}
             <NotificationBell />
-            
+
             {/* User info */}
             <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
               <span>
